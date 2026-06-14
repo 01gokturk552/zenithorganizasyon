@@ -153,8 +153,8 @@ export default function AdminAyarlarPage() {
             <h2 className="font-black text-[#0d1b3e] text-sm">Sosyal Medya</h2>
           </div>
           <div className="space-y-4">
-            <Field label="Share2" id="instagram" placeholder="https://instagram.com/..." icon={Share2} />
-            <Field label="AtSign / X" id="twitter" placeholder="https://twitter.com/..."  icon={AtSign} />
+            <Field label="Instagram" id="instagram" placeholder="https://instagram.com/..." icon={Share2} />
+            <Field label="X / Twitter" id="twitter" placeholder="https://twitter.com/..."  icon={AtSign} />
             <Field label="LinkedIn"  id="linkedin"  placeholder="https://linkedin.com/..."  icon={Link2} />
             <Field label="YouTube"   id="youtube"   placeholder="https://youtube.com/..."   icon={PlayCircle} />
           </div>

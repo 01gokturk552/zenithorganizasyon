@@ -3,6 +3,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Upload, CheckCircle, User, Phone, Mail, MapPin, MessageSquare } from "lucide-react";
+import { addApplication } from "@/lib/applications";
 
 const departments = [
   { id: "pr", label: "PR Departmanı" },
@@ -23,6 +24,17 @@ export default function BasvuruPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    addApplication({
+      ad:       form.ad,
+      soyad:    form.soyad,
+      yas:      form.yas,
+      sehir:    form.sehir,
+      telefon:  form.telefon,
+      email:    form.email,
+      discord:  form.discord,
+      deneyim:  form.deneyim,
+      dept:     form.departman,
+    });
     setSubmitted(true);
   };
 
