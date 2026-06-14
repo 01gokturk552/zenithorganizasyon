@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, LogIn } from "lucide-react";
 
 const navItems = [
   { label: "Ana Sayfa", href: "/" },
@@ -108,7 +108,7 @@ export default function Navbar() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-2.5">
+          <div className="hidden lg:flex items-center gap-2">
             <Link
               href="/basvuru"
               className="px-4 py-2 text-sm font-semibold text-[#0d1b3e] border border-[#0d1b3e]/20 rounded-xl hover:border-[#0d1b3e] hover:bg-[#0d1b3e]/5 transition-all"
@@ -117,9 +117,15 @@ export default function Navbar() {
             </Link>
             <Link
               href="/teklif"
-              className="px-5 py-2.5 text-sm font-bold bg-[#0d1b3e] text-white rounded-xl hover:bg-[#152552] shadow-sm hover:shadow-md transition-all"
+              className="px-4 py-2.5 text-sm font-bold bg-[#0d1b3e] text-white rounded-xl hover:bg-[#152552] shadow-sm hover:shadow-md transition-all"
             >
               Teklif Al
+            </Link>
+            <Link
+              href="/giris"
+              className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold bg-[#0d1b3e]/8 text-[#0d1b3e] border border-[#0d1b3e]/15 rounded-xl hover:bg-[#0d1b3e] hover:text-white hover:border-[#0d1b3e] transition-all"
+            >
+              <LogIn size={15} /> Personel Girişi
             </Link>
           </div>
 
@@ -175,6 +181,13 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               Teklif Al
+            </Link>
+            <Link
+              href="/giris"
+              className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold border border-[#0d1b3e]/15 text-[#0d1b3e] rounded-xl"
+              onClick={() => setMobileOpen(false)}
+            >
+              <LogIn size={15} /> Personel Girişi
             </Link>
           </div>
         </div>
