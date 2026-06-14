@@ -6,13 +6,7 @@ import {
   Briefcase, DollarSign, Monitor, CheckCircle,
   ChevronRight, ArrowUpRight
 } from "lucide-react";
-
-const stats = [
-  { value: "500+", label: "Tamamlanan Etkinlik" },
-  { value: "50+", label: "Uzman Kadro" },
-  { value: "7", label: "Departman" },
-  { value: "100%", label: "Çözüm Odaklı" },
-];
+import { HeroStats, StatsBand } from "@/components/SiteStats";
 
 const services = [
   { icon: Megaphone, title: "PR", label: "Halkla İlişkiler", desc: "Kurumsal iletişim stratejisi ve medya yönetimi.", href: "/hizmetlerimiz/pr" },
@@ -83,22 +77,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Stats grid */}
-            <div className="grid grid-cols-2 gap-4">
-              {stats.map((s, i) => (
-                <div
-                  key={s.label}
-                  className={`rounded-2xl p-7 border ${
-                    i === 0
-                      ? "bg-white text-[#0d1b3e] border-white col-span-2"
-                      : "bg-white/6 border-white/10 text-white"
-                  }`}
-                >
-                  <div className={`text-4xl font-black mb-1.5 ${i === 0 ? "text-[#0d1b3e]" : "text-white"}`}>{s.value}</div>
-                  <div className={`text-sm font-medium ${i === 0 ? "text-[#0d1b3e]/50" : "text-white/50"}`}>{s.label}</div>
-                </div>
-              ))}
-            </div>
+            {/* Stats grid — Admin panelinden yönetilir */}
+            <HeroStats />
           </div>
         </div>
 
@@ -203,14 +183,7 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-5xl font-black text-white mb-2">{s.value}</div>
-                <div className="text-white/35 text-xs uppercase tracking-widest font-semibold">{s.label}</div>
-              </div>
-            ))}
-          </div>
+          <StatsBand />
         </div>
       </section>
 

@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, FileText, Bell, Settings, LogOut,
   Search, Menu, X, BarChart2, ChevronRight, Plus,
   FileX, UserX, InboxIcon, ArrowUpRight, Shield,
-  Megaphone, Camera, Briefcase, DollarSign, Monitor
+  Megaphone, Camera, Briefcase, DollarSign, Monitor, Hash
 } from "lucide-react";
 
 const navGroups = [
@@ -39,7 +39,8 @@ const navGroups = [
   {
     label: "Sistem",
     items: [
-      { icon: Settings, label: "Ayarlar", href: "/admin/ayarlar" },
+      { icon: Hash,     label: "İstatistikler", href: "/admin/istatistikler" },
+      { icon: Settings, label: "Ayarlar",        href: "/admin/ayarlar" },
     ],
   },
 ];
