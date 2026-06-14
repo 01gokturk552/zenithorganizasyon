@@ -4,69 +4,13 @@ import Link from "next/link";
 import { Megaphone, Users, Camera, Shield, Briefcase, DollarSign, Monitor, ArrowUpRight } from "lucide-react";
 
 const departments = [
-  {
-    icon: Megaphone,
-    code: "01",
-    title: "PR Departmanı",
-    desc: "Kurumsal iletişim, marka yönetimi ve medya ilişkileri alanında uzman ekibimiz.",
-    href: "/departmanlar/pr",
-    members: 12,
-    projects: 45,
-  },
-  {
-    icon: Users,
-    code: "02",
-    title: "Saha Departmanı",
-    desc: "Alan yönetimi, koordinasyon ve operasyonel süreçlerin yürütülmesi.",
-    href: "/departmanlar/saha",
-    members: 18,
-    projects: 120,
-  },
-  {
-    icon: Camera,
-    code: "03",
-    title: "Press Departmanı",
-    desc: "Fotoğraf, video prodüksiyonu ve medya yönetimi hizmetleri.",
-    href: "/departmanlar/press",
-    members: 6,
-    projects: 89,
-  },
-  {
-    icon: Shield,
-    code: "04",
-    title: "Güvenlik Departmanı",
-    desc: "Risk analizi, alan kontrolü ve güvenlik protokollerinin uygulanması.",
-    href: "/departmanlar/guvenlik",
-    members: 10,
-    projects: 78,
-  },
-  {
-    icon: Briefcase,
-    code: "05",
-    title: "İK Departmanı",
-    desc: "Personel yönetimi, eğitim ve ekip oluşturma süreçleri.",
-    href: "/departmanlar/ik",
-    members: 4,
-    projects: 50,
-  },
-  {
-    icon: DollarSign,
-    code: "06",
-    title: "Finans Departmanı",
-    desc: "Bütçe yönetimi, sponsorluk takibi ve finansal planlama.",
-    href: "/departmanlar/finans",
-    members: 3,
-    projects: 50,
-  },
-  {
-    icon: Monitor,
-    code: "07",
-    title: "IT Departmanı",
-    desc: "Web geliştirme, sistem yönetimi ve teknik destek çözümleri.",
-    href: "/departmanlar/it",
-    members: 7,
-    projects: 35,
-  },
+  { icon: Megaphone, code: "01", title: "PR Departmanı",       desc: "Kurumsal iletişim, marka yönetimi ve medya ilişkileri alanında uzman ekibimiz.", href: "/departmanlar/pr" },
+  { icon: Users,     code: "02", title: "Saha Departmanı",     desc: "Alan yönetimi, koordinasyon ve operasyonel süreçlerin yürütülmesi.",            href: "/departmanlar/saha" },
+  { icon: Camera,    code: "03", title: "Press Departmanı",    desc: "Fotoğraf, video prodüksiyonu ve medya yönetimi hizmetleri.",                    href: "/departmanlar/press" },
+  { icon: Shield,    code: "04", title: "Güvenlik Departmanı", desc: "Risk analizi, alan kontrolü ve güvenlik protokollerinin uygulanması.",           href: "/departmanlar/guvenlik" },
+  { icon: Briefcase, code: "05", title: "İK Departmanı",       desc: "Personel yönetimi, eğitim ve ekip oluşturma süreçleri.",                        href: "/departmanlar/ik" },
+  { icon: DollarSign,code: "06", title: "Finans Departmanı",   desc: "Bütçe yönetimi, sponsorluk takibi ve finansal planlama.",                       href: "/departmanlar/finans" },
+  { icon: Monitor,   code: "07", title: "IT Departmanı",       desc: "Web geliştirme, sistem yönetimi ve teknik destek çözümleri.",                   href: "/departmanlar/it" },
 ];
 
 export default function DepartmanlarPage() {
@@ -123,18 +67,7 @@ export default function DepartmanlarPage() {
                   {dept.desc}
                 </p>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-5">
-                    <div>
-                      <div className={`text-xl font-black ${i === 0 ? "text-white" : "text-[#0d1b3e]"}`}>{dept.members}</div>
-                      <div className={`text-xs font-medium ${i === 0 ? "text-white/35" : "text-[#0d1b3e]/35"}`}>Üye</div>
-                    </div>
-                    <div className={`w-px h-8 ${i === 0 ? "bg-white/15" : "bg-[#0d1b3e]/10"}`} />
-                    <div>
-                      <div className={`text-xl font-black ${i === 0 ? "text-white" : "text-[#0d1b3e]"}`}>{dept.projects}</div>
-                      <div className={`text-xs font-medium ${i === 0 ? "text-white/35" : "text-[#0d1b3e]/35"}`}>Proje</div>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-end">
                   <div className={`flex items-center gap-1.5 text-sm font-semibold transition-all group-hover:gap-2 ${
                     i === 0 ? "text-white/60 group-hover:text-white" : "text-[#0d1b3e]/40 group-hover:text-[#0d1b3e]"
                   }`}>

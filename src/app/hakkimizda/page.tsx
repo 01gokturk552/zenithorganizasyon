@@ -57,16 +57,6 @@ const differentiators = [
   "Her projede maksimum verimlilik ve memnuniyet",
 ];
 
-const team = [
-  { name: "Genel Başkan", role: "Yönetim Kurulu", initial: "G" },
-  { name: "PR Başkanı", role: "PR Departmanı", initial: "P" },
-  { name: "Saha Başkanı", role: "Saha Departmanı", initial: "S" },
-  { name: "Press Başkanı", role: "Press Departmanı", initial: "P" },
-  { name: "Güvenlik Başkanı", role: "Güvenlik Departmanı", initial: "G" },
-  { name: "İK Başkanı", role: "İnsan Kaynakları", initial: "İ" },
-  { name: "Finans Başkanı", role: "Finans Departmanı", initial: "F" },
-  { name: "IT Başkanı", role: "IT Departmanı", initial: "I" },
-];
 
 export default function HakkimizdaPage() {
   return (
@@ -211,34 +201,6 @@ export default function HakkimizdaPage() {
                 </div>
                 <h3 className={`font-bold text-base mb-2 ${i === 0 ? "text-white" : "text-[#0d1b3e]"}`}>{v.title}</h3>
                 <p className={`text-sm leading-relaxed ${i === 0 ? "text-white/55" : "text-[#0d1b3e]/55"}`}>{v.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── LİDERLİK KADROSU ── */}
-      <section className="py-24 bg-[#f8f9fc] border-t border-[#e2e7f0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold text-[#0d1b3e]/35 uppercase tracking-widest mb-4">Yapımız</p>
-            <h2 className="text-4xl font-black text-[#0d1b3e] mb-4">Departman Başkanlarımız</h2>
-            <p className="text-[#0d1b3e]/50 max-w-xl mx-auto text-[15px]">
-              7 departmanımızın her birinde uzman liderler etkinliğinizi yönetiyor.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {team.map((member) => (
-              <div
-                key={member.name}
-                className="bg-white border border-[#e2e7f0] rounded-2xl p-6 text-center hover:border-[#0d1b3e]/20 hover:shadow-md transition-all group"
-              >
-                <div className="w-14 h-14 bg-[#0d1b3e] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-[#152552] transition-colors">
-                  <span className="text-white font-black text-lg">{member.initial}</span>
-                </div>
-                <h3 className="font-bold text-[#0d1b3e] text-sm mb-1">{member.name}</h3>
-                <p className="text-[#0d1b3e]/40 text-xs">{member.role}</p>
               </div>
             ))}
           </div>

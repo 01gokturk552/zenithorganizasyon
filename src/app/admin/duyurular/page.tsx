@@ -1,92 +1,167 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Trash2, Edit2, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit2, Eye, EyeOff, X, BellOff } from "lucide-react";
 
-const initialAnnouncements = [
-  { id: 1, title: "Yeni Sezon Ekip Alımları Başladı", date: "2024-06-10", shown: true, category: "Duyuru" },
-  { id: 2, title: "Mega Fest 2024 Tamamlandı", date: "2024-06-05", shown: true, category: "Etkinlik" },
-  { id: 3, title: "IT Sistemi Devreye Alındı", date: "2024-06-01", shown: false, category: "Teknoloji" },
-];
+type Announcement = {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  date: string;
+  shown: boolean;
+};
+
+const categories = ["Duyuru", "Etkinlik", "Teknoloji", "Haberler", "Sektör"];
+
+const categoryColors: Record<string, string> = {
+  "Duyuru": "bg-blue-50 text-blue-700 border-blue-200",
+  "Etkinlik": "bg-green-50 text-green-700 border-green-200",
+  "Teknoloji": "bg-purple-50 text-purple-700 border-purple-200",
+  "Haberler": "bg-amber-50 text-amber-700 border-amber-200",
+  "Sektör": "bg-indigo-50 text-indigo-700 border-indigo-200",
+};
 
 export default function AdminDuyurularPage() {
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: "", category: "Duyuru", shown: true });
+  const [editId, setEditId] = useState<number | null>(null);
+  const [form, setForm] = useState({ title: "", content: "", category: "Duyuru", shown: true });
+
+  const resetForm = () => {
+    setForm({ title: "", content: "", category: "Duyuru", shown: true });
+    setEditId(null);
+    setShowForm(false);
+  };
+
+  const handleSave = () => {
+    if (!form.title) return;
+    if (editId !== null) {
+      setAnnouncements((prev) =>
+        prev.map((a) => a.id === editId ? { ...a, ...form } : a)
+      );
+    } else {
+      setAnnouncements((prev) => [
+        {
+          id: Date.now(),
+          ...form,
+          date: new Date().toLocaleDateString("tr-TR"),
+        },
+        ...prev,
+      ]);
+    }
+    resetForm();
+  };
+
+  const handleEdit = (a: Announcement) => {
+    setForm({ title: a.title, content: a.content, category: a.category, shown: a.shown });
+    setEditId(a.id);
+    setShowForm(true);
+  };
 
   const toggleShown = (id: number) => {
     setAnnouncements((prev) => prev.map((a) => a.id === id ? { ...a, shown: !a.shown } : a));
   };
 
-  const deleteAnnouncement = (id: number) => {
+  const handleDelete = (id: number) => {
     setAnnouncements((prev) => prev.filter((a) => a.id !== id));
   };
 
-  const addAnnouncement = () => {
-    if (!form.title) return;
-    setAnnouncements((prev) => [
-      { id: Date.now(), title: form.title, date: new Date().toISOString().split("T")[0], shown: form.shown, category: form.category },
-      ...prev,
-    ]);
-    setForm({ title: "", category: "Duyuru", shown: true });
-    setShowForm(false);
-  };
+  const visibleCount = announcements.filter((a) => a.shown).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6 gap-4">
-        <Link href="/admin" className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-          <ArrowLeft size={20} className="text-[#0f1f4b]" />
+    <div className="min-h-screen bg-[#f4f6fa]">
+
+      <header className="bg-white border-b border-[#e8ecf3] h-[64px] flex items-center px-6 gap-4">
+        <Link href="/admin" className="p-2 hover:bg-[#f4f6fa] rounded-xl transition-colors">
+          <ArrowLeft size={18} className="text-[#0d1b3e]/60" />
         </Link>
-        <h1 className="font-black text-[#0f1f4b] text-lg">Duyuru Yönetimi</h1>
+        <div>
+          <p className="text-xs text-[#0d1b3e]/35 font-medium">Admin Panel</p>
+          <h1 className="font-black text-[#0d1b3e] text-base leading-none">Duyuru Yönetimi</h1>
+        </div>
+        <button
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="ml-auto flex items-center gap-2 bg-[#0d1b3e] text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-[#152552] transition-all"
+        >
+          <Plus size={15} /> Duyuru Ekle
+        </button>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 bg-[#0f1f4b] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1a3278] transition-all"
-          >
-            <Plus size={16} /> Duyuru Ekle
-          </button>
+      <main className="max-w-3xl mx-auto px-6 py-7">
+
+        {/* Özet */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {[
+            { label: "Toplam", value: announcements.length, color: "text-[#0d1b3e]" },
+            { label: "Yayında", value: visibleCount, color: "text-emerald-600" },
+            { label: "Gizli", value: announcements.length - visibleCount, color: "text-[#0d1b3e]/40" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white border border-[#e8ecf3] rounded-2xl p-4 text-center">
+              <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-[#0d1b3e]/35 font-medium mt-0.5">{s.label}</div>
+            </div>
+          ))}
         </div>
 
+        {/* Form */}
         {showForm && (
-          <div className="bg-white border border-[#0f1f4b]/10 rounded-2xl p-6 mb-6">
-            <h3 className="font-bold text-[#0f1f4b] mb-4">Yeni Duyuru</h3>
+          <div className="bg-white border border-[#e8ecf3] rounded-2xl p-6 mb-6 shadow-sm">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-bold text-[#0d1b3e]">{editId !== null ? "Duyuruyu Düzenle" : "Yeni Duyuru"}</h3>
+              <button onClick={resetForm} className="p-1.5 hover:bg-[#f4f6fa] rounded-lg transition-colors">
+                <X size={16} className="text-[#0d1b3e]/40" />
+              </button>
+            </div>
             <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Duyuru başlığı..."
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full border border-[#0f1f4b]/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0f1f4b]"
-              />
-              <div className="flex gap-4">
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="border border-[#0f1f4b]/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0f1f4b]"
-                >
-                  {["Duyuru", "Etkinlik", "Teknoloji", "Haberler"].map((c) => (
-                    <option key={c}>{c}</option>
-                  ))}
-                </select>
-                <label className="flex items-center gap-2 text-sm text-[#0f1f4b]/70">
-                  <input
-                    type="checkbox"
-                    checked={form.shown}
-                    onChange={(e) => setForm({ ...form, shown: e.target.checked })}
-                    className="w-4 h-4 accent-[#0f1f4b]"
-                  />
-                  Anasayfada Göster
-                </label>
+              <div>
+                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">Başlık *</label>
+                <input
+                  type="text"
+                  placeholder="Duyuru başlığı..."
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/30 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none"
+                />
               </div>
-              <div className="flex gap-3">
-                <button onClick={addAnnouncement} className="bg-[#0f1f4b] text-white px-5 py-2 rounded-xl text-sm font-semibold">
-                  Kaydet
+              <div>
+                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">İçerik</label>
+                <textarea
+                  placeholder="Duyuru içeriği (opsiyonel)..."
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                  rows={3}
+                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/30 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none resize-none"
+                />
+              </div>
+              <div className="flex gap-4 flex-wrap">
+                <div>
+                  <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">Kategori</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="border border-[#e8ecf3] focus:border-[#0d1b3e]/30 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
+                  >
+                    {categories.map((c) => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.shown}
+                      onChange={(e) => setForm({ ...form, shown: e.target.checked })}
+                      className="w-4 h-4 accent-[#0d1b3e]"
+                    />
+                    <span className="text-sm text-[#0d1b3e]/60 font-medium">Blog&apos;da Yayınla</span>
+                  </label>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={handleSave} className="bg-[#0d1b3e] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#152552] transition-all">
+                  {editId !== null ? "Güncelle" : "Yayınla"}
                 </button>
-                <button onClick={() => setShowForm(false)} className="border border-[#0f1f4b]/20 text-[#0f1f4b] px-5 py-2 rounded-xl text-sm font-semibold">
+                <button onClick={resetForm} className="border border-[#e8ecf3] text-[#0d1b3e]/60 px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#f4f6fa] transition-all">
                   İptal
                 </button>
               </div>
@@ -94,38 +169,63 @@ export default function AdminDuyurularPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div className="divide-y divide-gray-100">
-            {announcements.map((a) => (
-              <div key={a.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${a.shown ? "bg-green-500" : "bg-gray-300"}`} />
-                  <div>
-                    <div className="font-medium text-[#0f1f4b] text-sm">{a.title}</div>
-                    <div className="text-gray-400 text-xs">{a.category} · {a.date}</div>
+        {/* Liste */}
+        <div className="bg-white rounded-2xl border border-[#e8ecf3] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#e8ecf3]">
+            <span className="font-bold text-[#0d1b3e] text-sm">Duyurular</span>
+          </div>
+
+          {announcements.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 px-6">
+              <div className="w-14 h-14 bg-[#f4f6fa] border border-[#e8ecf3] rounded-2xl flex items-center justify-center mb-4">
+                <BellOff size={22} className="text-[#0d1b3e]/25" />
+              </div>
+              <p className="text-[#0d1b3e]/50 font-semibold text-sm mb-1">Henüz duyuru eklenmedi</p>
+              <p className="text-[#0d1b3e]/30 text-xs text-center">
+                "Duyuru Ekle" butonunu kullanarak ilk duyuruyu oluşturun.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-[#f4f6fa]">
+              {announcements.map((a) => (
+                <div key={a.id} className="flex items-start justify-between px-6 py-4 hover:bg-[#f9fafc] transition-colors gap-4">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${a.shown ? "bg-emerald-400" : "bg-gray-300"}`} />
+                    <div className="min-w-0">
+                      <div className="font-semibold text-[#0d1b3e] text-sm">{a.title}</div>
+                      {a.content && (
+                        <div className="text-[#0d1b3e]/40 text-xs mt-0.5 line-clamp-1">{a.content}</div>
+                      )}
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${categoryColors[a.category] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+                          {a.category}
+                        </span>
+                        <span className="text-[#0d1b3e]/25 text-xs">{a.date}</span>
+                        {!a.shown && <span className="text-[10px] font-bold text-[#0d1b3e]/25">· Gizli</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button
+                      onClick={() => toggleShown(a.id)}
+                      className="p-1.5 hover:bg-[#f4f6fa] rounded-lg transition-colors"
+                      title={a.shown ? "Gizle" : "Yayınla"}
+                    >
+                      {a.shown
+                        ? <Eye size={14} className="text-emerald-500" />
+                        : <EyeOff size={14} className="text-[#0d1b3e]/30" />}
+                    </button>
+                    <button onClick={() => handleEdit(a)} className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors">
+                      <Edit2 size={14} className="text-blue-500" />
+                    </button>
+                    <button onClick={() => handleDelete(a.id)} className="p-1.5 hover:bg-red-50 rounded-lg transition-colors">
+                      <Trash2 size={14} className="text-red-400" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => toggleShown(a.id)}
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                    title={a.shown ? "Gizle" : "Göster"}
-                  >
-                    {a.shown ? <Eye size={14} className="text-green-600" /> : <EyeOff size={14} className="text-gray-400" />}
-                  </button>
-                  <button className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors">
-                    <Edit2 size={14} className="text-blue-600" />
-                  </button>
-                  <button
-                    onClick={() => deleteAnnouncement(a.id)}
-                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 size={14} className="text-red-500" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>

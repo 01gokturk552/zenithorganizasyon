@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   ArrowRight, Megaphone, Users, Camera, Shield,
   Briefcase, DollarSign, Monitor, CheckCircle,
-  ChevronRight, Calendar, ArrowUpRight
+  ChevronRight, ArrowUpRight
 } from "lucide-react";
 
 const stats = [
@@ -34,13 +34,6 @@ const whyUs = [
   "Uçtan uca organizasyon desteği",
 ];
 
-const announcements = [
-  { date: "10 Haziran 2024", title: "Yeni Sezon Ekip Alımları Başladı", tag: "Duyuru", href: "/blog/1" },
-  { date: "5 Haziran 2024", title: "Büyük Fest Organizasyonu Başarıyla Tamamlandı", tag: "Etkinlik", href: "/blog/2" },
-  { date: "1 Haziran 2024", title: "IT Departmanı Yeni Sistemlerini Devreye Aldı", tag: "Teknoloji", href: "/blog/3" },
-];
-
-const partners = ["Partner A", "Partner B", "Partner C", "Partner D", "Partner E", "Partner F", "Partner G", "Partner H"];
 
 export default function HomePage() {
   return (
@@ -111,22 +104,6 @@ export default function HomePage() {
 
         {/* Bottom fade */}
         <div className="h-12 bg-gradient-to-b from-transparent to-white absolute bottom-0 left-0 right-0" />
-      </section>
-
-      {/* ── PARTNER LOGOS ── */}
-      <section className="py-10 border-b border-[#e2e7f0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-[#0d1b3e]/30 text-xs font-bold uppercase tracking-widest mb-8">
-            Güvenilen İş Ortakları
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-6">
-            {partners.map((p) => (
-              <div key={p} className="h-10 px-6 rounded-lg border border-[#e2e7f0] flex items-center text-[#0d1b3e]/25 font-bold text-sm hover:border-[#0d1b3e]/20 hover:text-[#0d1b3e]/40 transition-all cursor-default">
-                {p}
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* ── HİZMETLER ── */}
@@ -232,49 +209,6 @@ export default function HomePage() {
                 <div className="text-5xl font-black text-white mb-2">{s.value}</div>
                 <div className="text-white/35 text-xs uppercase tracking-widest font-semibold">{s.label}</div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SON DUYURULAR ── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <p className="text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-widest mb-3">Güncel</p>
-              <h2 className="text-3xl font-black text-[#0d1b3e]">Haberler & Duyurular</h2>
-            </div>
-            <Link href="/blog" className="flex items-center gap-1.5 text-sm font-semibold text-[#0d1b3e]/50 hover:text-[#0d1b3e] transition-colors group">
-              Tümünü Gör <ArrowUpRight size={15} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-          </div>
-          <div className="grid md:grid-cols-3 gap-5">
-            {announcements.map((a, i) => (
-              <Link
-                key={a.title}
-                href={a.href}
-                className={`group rounded-2xl p-7 border transition-all hover:shadow-lg hover:-translate-y-0.5 ${
-                  i === 0 ? "bg-[#0d1b3e] text-white border-[#0d1b3e]" : "bg-white border-[#e2e7f0] hover:border-[#0d1b3e]/20"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
-                    i === 0 ? "bg-white/10 text-white/70" : "bg-[#0d1b3e]/5 text-[#0d1b3e]/60"
-                  }`}>
-                    {a.tag}
-                  </span>
-                  <div className={`flex items-center gap-1.5 text-xs ${i === 0 ? "text-white/40" : "text-[#0d1b3e]/35"}`}>
-                    <Calendar size={11} /> {a.date}
-                  </div>
-                </div>
-                <h3 className={`font-bold text-lg leading-snug mb-5 ${i === 0 ? "text-white" : "text-[#0d1b3e] group-hover:text-[#152552]"} transition-colors`}>
-                  {a.title}
-                </h3>
-                <div className={`flex items-center gap-1.5 text-sm font-semibold ${i === 0 ? "text-white/60 group-hover:text-white" : "text-[#0d1b3e]/40 group-hover:text-[#0d1b3e]"} transition-all`}>
-                  Devamını Oku <ChevronRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </Link>
             ))}
           </div>
         </div>
