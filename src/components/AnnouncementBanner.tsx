@@ -1,14 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { X, Bell } from "lucide-react";
-
-type Announcement = {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  shown: boolean;
-};
+import { getAnnouncements, type Announcement } from "@/lib/db";
 
 const categoryStyle: Record<string, string> = {
   "Duyuru":    "bg-blue-600",
@@ -19,14 +12,11 @@ const categoryStyle: Record<string, string> = {
 };
 
 export default function AnnouncementBanner() {
-  const [items, setItems] = useState<Announcement[]>([]);
+  const [items, setItems]         = useState<Announcement[]>([]);
   const [dismissed, setDismissed] = useState<number[]>([]);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zenith_announcements");
-      if (raw) setItems(JSON.parse(raw));
-    } catch { /* ignore */ }
+    getAnnouncements().then((data) => setItems(data.filter((a) => a.shown)));
     try {
       const d = sessionStorage.getItem("zenith_dismissed");
       if (d) setDismissed(JSON.parse(d));
@@ -39,7 +29,7 @@ export default function AnnouncementBanner() {
     try { sessionStorage.setItem("zenith_dismissed", JSON.stringify(next)); } catch { /* ignore */ }
   };
 
-  const visible = items.filter((a) => a.shown && !dismissed.includes(a.id));
+  const visible = items.filter((a) => !dismissed.includes(a.id));
   if (visible.length === 0) return null;
 
   const current = visible[0];

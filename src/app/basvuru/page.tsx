@@ -22,9 +22,9 @@ export default function BasvuruPage() {
     email: "", discord: "", deneyim: "", departman: "", cv: null as File | null,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addApplication({
+    await addApplication({
       ad:       form.ad,
       soyad:    form.soyad,
       yas:      form.yas,

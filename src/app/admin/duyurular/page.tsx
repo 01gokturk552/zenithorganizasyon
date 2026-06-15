@@ -2,17 +2,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Edit2, Eye, EyeOff, X, BellOff } from "lucide-react";
+import {
+  getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement,
+  type Announcement,
+} from "@/lib/db";
 
-type Announcement = {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  date: string;
-  shown: boolean;
-};
-
-const STORAGE_KEY = "zenith_announcements";
 const categories = ["Duyuru", "Etkinlik", "Teknoloji", "Haberler", "Sektör"];
 
 const categoryColors: Record<string, string> = {
@@ -23,31 +17,15 @@ const categoryColors: Record<string, string> = {
   "Sektör":    "bg-indigo-50 text-indigo-700 border-indigo-200",
 };
 
-function load(): Announcement[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function save(items: Announcement[]) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch { /* ignore */ }
-}
-
 export default function AdminDuyurularPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({ title: "", content: "", category: "Duyuru", shown: true });
 
-  useEffect(() => {
-    setAnnouncements(load());
-  }, []);
+  const reload = () => getAnnouncements().then(setAnnouncements);
 
-  const mutate = (next: Announcement[]) => {
-    setAnnouncements(next);
-    save(next);
-  };
+  useEffect(() => { reload(); }, []);
 
   const resetForm = () => {
     setForm({ title: "", content: "", category: "Duyuru", shown: true });
@@ -55,20 +33,14 @@ export default function AdminDuyurularPage() {
     setShowForm(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title.trim()) return;
-    let next: Announcement[];
     if (editId !== null) {
-      next = announcements.map((a) => a.id === editId ? { ...a, ...form } : a);
+      await updateAnnouncement(editId, form);
     } else {
-      const newItem: Announcement = {
-        id: Date.now(),
-        ...form,
-        date: new Date().toLocaleDateString("tr-TR"),
-      };
-      next = [newItem, ...announcements];
+      await addAnnouncement({ ...form, date: new Date().toLocaleDateString("tr-TR") });
     }
-    mutate(next);
+    await reload();
     resetForm();
   };
 
@@ -78,12 +50,14 @@ export default function AdminDuyurularPage() {
     setShowForm(true);
   };
 
-  const toggleShown = (id: number) => {
-    mutate(announcements.map((a) => a.id === id ? { ...a, shown: !a.shown } : a));
+  const toggleShown = async (id: number, current: boolean) => {
+    await updateAnnouncement(id, { shown: !current });
+    await reload();
   };
 
-  const handleDelete = (id: number) => {
-    mutate(announcements.filter((a) => a.id !== id));
+  const handleDelete = async (id: number) => {
+    await deleteAnnouncement(id);
+    await reload();
   };
 
   const visibleCount = announcements.filter((a) => a.shown).length;
@@ -231,7 +205,7 @@ export default function AdminDuyurularPage() {
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button
-                      onClick={() => toggleShown(a.id)}
+                      onClick={() => toggleShown(a.id, a.shown)}
                       className="p-1.5 hover:bg-[#f4f6fa] rounded-lg transition-colors"
                       title={a.shown ? "Gizle" : "Yayınla"}
                     >

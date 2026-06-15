@@ -2,18 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Edit2, Search, UserX, X } from "lucide-react";
+import { getMembers, addMember, updateMember, deleteMember, type Member } from "@/lib/db";
 
-type Member = {
-  id: number;
-  name: string;
-  dept: string;
-  role: string;
-  email: string;
-  status: "Aktif" | "İzinli" | "Pasif";
-  joined: string;
-};
-
-const STORAGE_KEY = "zenith_members";
 const depts = ["Tümü", "PR", "Saha", "Press", "Güvenlik", "İK", "Finans", "IT"];
 
 const statusColors: Record<string, string> = {
@@ -21,17 +11,6 @@ const statusColors: Record<string, string> = {
   "İzinli": "bg-amber-50 text-amber-700 border-amber-200",
   "Pasif":  "bg-gray-100 text-gray-500 border-gray-200",
 };
-
-function load(): Member[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function persist(items: Member[]) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch { /* ignore */ }
-}
 
 export default function AdminUyelerPage() {
   const [search, setSearch] = useState("");
@@ -41,9 +20,9 @@ export default function AdminUyelerPage() {
   const [form, setForm] = useState({ name: "", dept: "PR", role: "", email: "", status: "Aktif" as Member["status"] });
   const [editId, setEditId] = useState<number | null>(null);
 
-  useEffect(() => { setMembers(load()); }, []);
+  const reload = () => getMembers().then(setMembers);
 
-  const mutate = (next: Member[]) => { setMembers(next); persist(next); };
+  useEffect(() => { reload(); }, []);
 
   const filtered = members.filter((m) => {
     const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -52,27 +31,29 @@ export default function AdminUyelerPage() {
     return matchSearch && matchDept;
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.email) return;
-    let next: Member[];
     if (editId !== null) {
-      next = members.map((m) => m.id === editId ? { ...m, ...form } : m);
+      await updateMember(editId, form);
       setEditId(null);
     } else {
-      next = [{ id: Date.now(), ...form, joined: new Date().toISOString().split("T")[0] }, ...members];
+      await addMember({ ...form, joined: new Date().toISOString().split("T")[0] });
     }
-    mutate(next);
+    await reload();
     setForm({ name: "", dept: "PR", role: "", email: "", status: "Aktif" });
     setShowForm(false);
   };
 
   const handleEdit = (m: Member) => {
-    setForm({ name: m.name, dept: m.dept, role: m.role, email: m.email, status: m.status });
+    setForm({ name: m.name, dept: m.dept, role: m.role, email: m.email, status: m.status as Member["status"] });
     setEditId(m.id);
     setShowForm(true);
   };
 
-  const handleDelete = (id: number) => { mutate(members.filter((m) => m.id !== id)); };
+  const handleDelete = async (id: number) => {
+    await deleteMember(id);
+    await reload();
+  };
 
   return (
     <div className="min-h-screen bg-[#f4f6fa]">

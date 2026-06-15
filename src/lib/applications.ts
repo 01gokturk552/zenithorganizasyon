@@ -1,3 +1,5 @@
+﻿import { supabase } from "./supabase";
+
 export type AppStatus =
   | "Beklemede"
   | "İnceleniyor"
@@ -15,47 +17,37 @@ export type Application = {
   email: string;
   discord: string;
   deneyim: string;
-  dept: string;        // "pr" | "saha" | "press" | "guvenlik" | "ik" | "finans" | "it"
+  dept: string;
   date: string;
   status: AppStatus;
 };
 
-const KEY = "zenith_applications";
-
-export function getApplications(): Application[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Application[]) : [];
-  } catch {
-    return [];
-  }
+export async function getApplications(): Promise<Application[]> {
+  const { data } = await supabase
+    .from("applications")
+    .select("*")
+    .order("created_at", { ascending: false });
+  return (data as Application[]) ?? [];
 }
 
-export function saveApplications(apps: Application[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(apps));
-  } catch { /* ignore */ }
-}
-
-export function addApplication(app: Omit<Application, "id" | "date" | "status">): Application {
-  const newApp: Application = {
+export async function addApplication(
+  app: Omit<Application, "id" | "date" | "status">
+): Promise<void> {
+  await supabase.from("applications").insert({
     ...app,
     id: Date.now().toString(),
     date: new Date().toLocaleDateString("tr-TR"),
     status: "Beklemede",
-  };
-  const all = getApplications();
-  saveApplications([newApp, ...all]);
-  return newApp;
+  });
 }
 
-export function updateApplicationStatus(id: string, status: AppStatus): void {
-  const all = getApplications();
-  saveApplications(all.map((a) => (a.id === id ? { ...a, status } : a)));
+export async function updateApplicationStatus(
+  id: string,
+  status: AppStatus
+): Promise<void> {
+  await supabase.from("applications").update({ status }).eq("id", id);
 }
 
-export function deleteApplication(id: string): void {
-  saveApplications(getApplications().filter((a) => a.id !== id));
+export async function deleteApplication(id: string): Promise<void> {
+  await supabase.from("applications").delete().eq("id", id);
 }

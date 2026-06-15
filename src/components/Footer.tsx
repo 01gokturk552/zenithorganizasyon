@@ -2,26 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Share2, AtSign, Link2, PlayCircle, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
-
-type Settings = {
-  email: string;
-  telefon: string;
-  adres: string;
-  instagram: string;
-  twitter: string;
-  linkedin: string;
-  youtube: string;
-};
-
-const DEFAULTS: Settings = {
-  email:     "info@zenithorganizasyon.com",
-  telefon:   "+90 (XXX) XXX XX XX",
-  adres:     "İstanbul, Türkiye",
-  instagram: "",
-  twitter:   "",
-  linkedin:  "",
-  youtube:   "",
-};
+import { getSettings, DEFAULT_SETTINGS, type Settings } from "@/lib/db";
 
 const footerLinks = {
   "Kurumsal": [
@@ -39,32 +20,26 @@ const footerLinks = {
     { label: "IT & Dijital",       href: "/hizmetlerimiz/it" },
   ],
   "Çalışmak İster misiniz?": [
-    { label: "Genel Başvuru",    href: "/basvuru" },
-    { label: "Teklif Al",        href: "/teklif" },
-    { label: "Medya Merkezi",    href: "/medya" },
-    { label: "KVKK",             href: "/kvkk" },
+    { label: "Genel Başvuru",       href: "/basvuru" },
+    { label: "Teklif Al",           href: "/teklif" },
+    { label: "Medya Merkezi",       href: "/medya" },
+    { label: "KVKK",                href: "/kvkk" },
     { label: "Gizlilik Politikası", href: "/gizlilik" },
   ],
 };
 
 export default function Footer() {
-  const [s, setS] = useState<Settings>(DEFAULTS);
+  const [s, setS] = useState<Settings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zenith_site_settings");
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<Settings>;
-        setS({ ...DEFAULTS, ...parsed });
-      }
-    } catch { /* ignore */ }
+    getSettings().then(setS);
   }, []);
 
   const socials = [
-    { icon: Share2,      label: "Instagram",  href: s.instagram || "#" },
-    { icon: AtSign,      label: "Twitter / X", href: s.twitter   || "#" },
-    { icon: Link2,       label: "LinkedIn",    href: s.linkedin  || "#" },
-    { icon: PlayCircle,  label: "YouTube",     href: s.youtube   || "#" },
+    { icon: Share2,     label: "Instagram",   href: s.instagram || "#" },
+    { icon: AtSign,     label: "Twitter / X", href: s.twitter   || "#" },
+    { icon: Link2,      label: "LinkedIn",    href: s.linkedin  || "#" },
+    { icon: PlayCircle, label: "YouTube",     href: s.youtube   || "#" },
   ];
 
   return (
@@ -77,16 +52,12 @@ export default function Footer() {
             <h2 className="text-2xl font-black">Etkinliğiniz için teklif alın</h2>
           </div>
           <div className="flex gap-3">
-            <Link
-              href="/teklif"
-              className="flex items-center gap-2 bg-white text-[#0d1b3e] px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/90 transition-all"
-            >
+            <Link href="/teklif"
+              className="flex items-center gap-2 bg-white text-[#0d1b3e] px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/90 transition-all">
               Teklif Al <ArrowUpRight size={16} />
             </Link>
-            <Link
-              href="/basvuru"
-              className="flex items-center gap-2 border border-white/20 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:border-white/40 hover:bg-white/5 transition-all"
-            >
+            <Link href="/basvuru"
+              className="flex items-center gap-2 border border-white/20 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:border-white/40 hover:bg-white/5 transition-all">
               Başvuru Yap
             </Link>
           </div>
@@ -129,12 +100,8 @@ export default function Footer() {
             </div>
             <div className="flex gap-2 mt-8">
               {socials.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  title={social.label}
-                  className="w-9 h-9 rounded-lg bg-white/8 hover:bg-white/15 border border-white/10 flex items-center justify-center transition-all"
-                >
+                <a key={social.label} href={social.href} title={social.label}
+                  className="w-9 h-9 rounded-lg bg-white/8 hover:bg-white/15 border border-white/10 flex items-center justify-center transition-all">
                   <social.icon size={15} className="text-white/60" />
                 </a>
               ))}
@@ -148,10 +115,7 @@ export default function Footer() {
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-white/55 hover:text-white text-sm transition-colors hover:translate-x-0.5 inline-block"
-                    >
+                    <Link href={link.href} className="text-white/55 hover:text-white text-sm transition-colors hover:translate-x-0.5 inline-block">
                       {link.label}
                     </Link>
                   </li>
@@ -168,8 +132,8 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-6">
             {[
-              { label: "KVKK",             href: "/kvkk" },
-              { label: "Gizlilik",         href: "/gizlilik" },
+              { label: "KVKK",              href: "/kvkk" },
+              { label: "Gizlilik",          href: "/gizlilik" },
               { label: "Kullanım Şartları", href: "/kullanim-sartlari" },
             ].map((link) => (
               <Link key={link.label} href={link.href} className="text-white/30 hover:text-white/60 text-xs transition-colors">

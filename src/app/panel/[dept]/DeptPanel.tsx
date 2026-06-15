@@ -47,21 +47,19 @@ export default function DeptPanel({ dept }: { dept: string }) {
 
   const info = deptInfo[dept] || { title: dept.toUpperCase() };
 
-  // localStorage'dan başvuruları yükle ve dept'e göre filtrele
   useEffect(() => {
-    const all = getApplications();
-    setApplications(all.filter((a) => a.dept === dept));
+    getApplications().then((all) => setApplications(all.filter((a) => a.dept === dept)));
   }, [dept]);
 
-  const handleStatus = (id: string, status: AppStatus) => {
-    updateApplicationStatus(id, status);
+  const handleStatus = async (id: string, status: AppStatus) => {
+    await updateApplicationStatus(id, status);
     setApplications((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status } : a))
     );
   };
 
-  const handleDelete = (id: string) => {
-    deleteApplication(id);
+  const handleDelete = async (id: string) => {
+    await deleteApplication(id);
     setApplications((prev) => prev.filter((a) => a.id !== id));
   };
 

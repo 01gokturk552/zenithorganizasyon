@@ -1,50 +1,26 @@
 "use client";
 import { useEffect, useState } from "react";
+import { getStats, saveStats, DEFAULT_STATS, type Stat } from "@/lib/db";
 
-export type Stat = {
-  id: string;
-  label: string;
-  value: string;
-  suffix: string;
-};
-
-const DEFAULT_STATS: Stat[] = [
-  { id: "etkinlik",  label: "Tamamlanan Etkinlik", value: "0",   suffix: "" },
-  { id: "kadro",     label: "Uzman Kadro",          value: "0",   suffix: "" },
-  { id: "departman", label: "Departman",             value: "7",   suffix: "" },
-  { id: "cozum",     label: "Çözüm Odaklı",          value: "100", suffix: "%" },
-];
-
-const STORAGE_KEY = "zenith_site_stats";
+export type { Stat };
 
 export function useStats() {
   const [stats, setStats] = useState<Stat[]>(DEFAULT_STATS);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setStats(JSON.parse(saved));
-    } catch {
-      // localStorage erişilemiyorsa varsayılanlar kullanılır
-    }
+    getStats().then(setStats);
   }, []);
 
-  const saveStats = (newStats: Stat[]) => {
+  const save = async (newStats: Stat[]) => {
     setStats(newStats);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newStats));
-    } catch {
-      // ignore
-    }
+    await saveStats(newStats);
   };
 
-  return { stats, saveStats };
+  return { stats, saveStats: save };
 }
 
-/* ── HERO GRID (hero bölümü sağı) ── */
 export function HeroStats() {
   const { stats } = useStats();
-
   return (
     <div className="grid grid-cols-2 gap-4">
       {stats.map((s, i) => (
@@ -68,10 +44,8 @@ export function HeroStats() {
   );
 }
 
-/* ── DARK BAND (orta lacivert şerit) ── */
 export function StatsBand() {
   const { stats } = useStats();
-
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
       {stats.map((s) => (

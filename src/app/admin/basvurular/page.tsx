@@ -34,9 +34,9 @@ export default function AdminBasvurularPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [detail, setDetail]   = useState<Application | null>(null);
 
-  useEffect(() => {
-    setApplications(getApplications());
-  }, []);
+  const reload = () => getApplications().then(setApplications);
+
+  useEffect(() => { reload(); }, []);
 
   const filtered = applications.filter((a) => {
     const fullName = `${a.ad} ${a.soyad}`.toLowerCase();
@@ -50,22 +50,22 @@ export default function AdminBasvurularPage() {
   const toggleSelect = (id: string) =>
     setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
-  const handleStatus = (id: string, s: AppStatus) => {
-    updateApplicationStatus(id, s);
-    setApplications(getApplications());
+  const handleStatus = async (id: string, s: AppStatus) => {
+    await updateApplicationStatus(id, s);
+    await reload();
     if (detail?.id === id) setDetail((d) => d ? { ...d, status: s } : null);
   };
 
-  const handleDelete = (id: string) => {
-    deleteApplication(id);
-    setApplications(getApplications());
+  const handleDelete = async (id: string) => {
+    await deleteApplication(id);
+    await reload();
     setSelected((prev) => prev.filter((x) => x !== id));
     if (detail?.id === id) setDetail(null);
   };
 
-  const bulkStatus = (s: AppStatus) => {
-    selected.forEach((id) => updateApplicationStatus(id, s));
-    setApplications(getApplications());
+  const bulkStatus = async (s: AppStatus) => {
+    await Promise.all(selected.map((id) => updateApplicationStatus(id, s)));
+    await reload();
     setSelected([]);
   };
 

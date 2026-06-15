@@ -2,46 +2,14 @@
 import Link from "next/link";
 import { ArrowLeft, Save, RotateCcw, Globe, Phone, Mail, MapPin, Clock, Share2, AtSign, Link2, PlayCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-
-type Settings = {
-  siteAdi: string;
-  slogan: string;
-  email: string;
-  telefon: string;
-  adres: string;
-  calismaGun: string;
-  calismaSaat: string;
-  instagram: string;
-  twitter: string;
-  linkedin: string;
-  youtube: string;
-};
-
-const DEFAULT: Settings = {
-  siteAdi:     "Zenith Organizasyon",
-  slogan:      "Etkinliğinizi Zirveye Taşıyoruz.",
-  email:       "",
-  telefon:     "",
-  adres:       "",
-  calismaGun:  "Pazartesi – Cuma",
-  calismaSaat: "09:00 – 18:00",
-  instagram:   "",
-  twitter:     "",
-  linkedin:    "",
-  youtube:     "",
-};
-
-const STORAGE_KEY = "zenith_site_settings";
+import { type Settings, DEFAULT_SETTINGS as DEFAULT } from "@/lib/db";
 
 export default function AdminAyarlarPage() {
   const [form, setForm]   = useState<Settings>(DEFAULT);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setForm({ ...DEFAULT, ...JSON.parse(raw) });
-    } catch { /* ignore */ }
+    import("@/lib/db").then(({ getSettings }) => getSettings().then(setForm));
   }, []);
 
   const update = (key: keyof Settings, val: string) => {
@@ -49,15 +17,17 @@ export default function AdminAyarlarPage() {
     setForm((prev) => ({ ...prev, [key]: val }));
   };
 
-  const handleSave = () => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(form)); } catch { /* ignore */ }
+  const handleSave = async () => {
+    const { saveSettings } = await import("@/lib/db");
+    await saveSettings(form);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    const { saveSettings } = await import("@/lib/db");
+    await saveSettings(DEFAULT);
     setForm(DEFAULT);
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
