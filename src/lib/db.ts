@@ -11,13 +11,20 @@ export const DEFAULT_STATS: Stat[] = [
 ];
 
 export async function getStats(): Promise<Stat[]> {
-  const { data } = await supabase.from("stats").select("*");
-  if (!data || data.length === 0) return DEFAULT_STATS;
-  return data as Stat[];
+  const { data } = await supabase
+    .from("settings")
+    .select("value")
+    .eq("key", "_stats_json")
+    .single();
+  if (!data?.value) return DEFAULT_STATS;
+  try { return JSON.parse(data.value) as Stat[]; }
+  catch { return DEFAULT_STATS; }
 }
 
 export async function saveStats(stats: Stat[]): Promise<void> {
-  await supabase.from("stats").upsert(stats, { onConflict: "id" });
+  await supabase
+    .from("settings")
+    .upsert({ key: "_stats_json", value: JSON.stringify(stats) }, { onConflict: "key" });
 }
 
 // ─── SETTINGS ───────────────────────────────────────────────────────────────
