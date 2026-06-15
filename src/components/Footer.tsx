@@ -1,38 +1,72 @@
+"use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Share2, AtSign, Link2, PlayCircle, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 
-const socials = [
-  { icon: Share2, label: "Instagram", href: "#" },
-  { icon: AtSign, label: "Twitter / X", href: "#" },
-  { icon: Link2, label: "LinkedIn", href: "#" },
-  { icon: PlayCircle, label: "YouTube", href: "#" },
-];
+type Settings = {
+  email: string;
+  telefon: string;
+  adres: string;
+  instagram: string;
+  twitter: string;
+  linkedin: string;
+  youtube: string;
+};
+
+const DEFAULTS: Settings = {
+  email:     "info@zenithorganizasyon.com",
+  telefon:   "+90 (XXX) XXX XX XX",
+  adres:     "İstanbul, Türkiye",
+  instagram: "",
+  twitter:   "",
+  linkedin:  "",
+  youtube:   "",
+};
 
 const footerLinks = {
   "Kurumsal": [
-    { label: "Hakkımızda", href: "/hakkimizda" },
+    { label: "Hakkımızda",  href: "/hakkimizda" },
     { label: "Departmanlar", href: "/departmanlar" },
     { label: "Referanslar", href: "/referanslar" },
-    { label: "Blog", href: "/blog" },
-    { label: "İletişim", href: "/iletisim" },
+    { label: "Blog",        href: "/blog" },
+    { label: "İletişim",   href: "/iletisim" },
   ],
   "Hizmetler": [
-    { label: "PR Hizmetleri", href: "/hizmetlerimiz/pr" },
+    { label: "PR Hizmetleri",      href: "/hizmetlerimiz/pr" },
     { label: "Saha Operasyonları", href: "/hizmetlerimiz/saha" },
-    { label: "Press & Medya", href: "/hizmetlerimiz/press" },
-    { label: "Güvenlik", href: "/hizmetlerimiz/guvenlik" },
-    { label: "IT & Dijital", href: "/hizmetlerimiz/it" },
+    { label: "Press & Medya",      href: "/hizmetlerimiz/press" },
+    { label: "Güvenlik",           href: "/hizmetlerimiz/guvenlik" },
+    { label: "IT & Dijital",       href: "/hizmetlerimiz/it" },
   ],
   "Çalışmak İster misiniz?": [
-    { label: "Genel Başvuru", href: "/basvuru" },
-    { label: "Teklif Al", href: "/teklif" },
-    { label: "Medya Merkezi", href: "/medya" },
-    { label: "KVKK", href: "/kvkk" },
+    { label: "Genel Başvuru",    href: "/basvuru" },
+    { label: "Teklif Al",        href: "/teklif" },
+    { label: "Medya Merkezi",    href: "/medya" },
+    { label: "KVKK",             href: "/kvkk" },
     { label: "Gizlilik Politikası", href: "/gizlilik" },
   ],
 };
 
 export default function Footer() {
+  const [s, setS] = useState<Settings>(DEFAULTS);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zenith_site_settings");
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Settings>;
+        setS({ ...DEFAULTS, ...parsed });
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const socials = [
+    { icon: Share2,      label: "Instagram",  href: s.instagram || "#" },
+    { icon: AtSign,      label: "Twitter / X", href: s.twitter   || "#" },
+    { icon: Link2,       label: "LinkedIn",    href: s.linkedin  || "#" },
+    { icon: PlayCircle,  label: "YouTube",     href: s.youtube   || "#" },
+  ];
+
   return (
     <footer className="bg-[#0d1b3e] text-white">
       {/* Top CTA strip */}
@@ -77,25 +111,31 @@ export default function Footer() {
               Etkinlik, zirve, konferans ve organizasyonlarda ihtiyaç duyulan insan kaynağını ve operasyonel desteği profesyonel standartlarda sağlıyoruz.
             </p>
             <div className="space-y-3">
-              <a href="tel:+90XXXXXXXXXX" className="flex items-center gap-3 text-white/50 text-sm hover:text-white transition-colors">
-                <Phone size={15} /> +90 (XXX) XXX XX XX
-              </a>
-              <a href="mailto:info@zenithorganizasyon.com" className="flex items-center gap-3 text-white/50 text-sm hover:text-white transition-colors">
-                <Mail size={15} /> info@zenithorganizasyon.com
-              </a>
-              <div className="flex items-center gap-3 text-white/50 text-sm">
-                <MapPin size={15} /> İstanbul, Türkiye
-              </div>
+              {s.telefon && (
+                <a href={`tel:${s.telefon}`} className="flex items-center gap-3 text-white/50 text-sm hover:text-white transition-colors">
+                  <Phone size={15} /> {s.telefon}
+                </a>
+              )}
+              {s.email && (
+                <a href={`mailto:${s.email}`} className="flex items-center gap-3 text-white/50 text-sm hover:text-white transition-colors">
+                  <Mail size={15} /> {s.email}
+                </a>
+              )}
+              {s.adres && (
+                <div className="flex items-center gap-3 text-white/50 text-sm">
+                  <MapPin size={15} /> {s.adres}
+                </div>
+              )}
             </div>
             <div className="flex gap-2 mt-8">
-              {socials.map((s) => (
+              {socials.map((social) => (
                 <a
-                  key={s.label}
-                  href={s.href}
-                  title={s.label}
+                  key={social.label}
+                  href={social.href}
+                  title={social.label}
                   className="w-9 h-9 rounded-lg bg-white/8 hover:bg-white/15 border border-white/10 flex items-center justify-center transition-all"
                 >
-                  <s.icon size={15} className="text-white/60" />
+                  <social.icon size={15} className="text-white/60" />
                 </a>
               ))}
             </div>
@@ -128,8 +168,8 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-6">
             {[
-              { label: "KVKK", href: "/kvkk" },
-              { label: "Gizlilik", href: "/gizlilik" },
+              { label: "KVKK",             href: "/kvkk" },
+              { label: "Gizlilik",         href: "/gizlilik" },
               { label: "Kullanım Şartları", href: "/kullanim-sartlari" },
             ].map((link) => (
               <Link key={link.label} href={link.href} className="text-white/30 hover:text-white/60 text-xs transition-colors">

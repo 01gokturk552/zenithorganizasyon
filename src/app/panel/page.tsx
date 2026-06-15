@@ -18,29 +18,29 @@ const departments = [
 
 export default function PanelSelectionPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#f4f6fa] flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-[#0f1f4b] rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#0d1b3e] rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-black text-2xl">Z</span>
           </div>
-          <h1 className="text-3xl font-black text-[#0f1f4b] mb-2">Zenith Panel</h1>
-          <p className="text-[#0f1f4b]/60">Departman panelinizi seçin</p>
+          <h1 className="text-3xl font-black text-[#0d1b3e] mb-2">Zenith Panel</h1>
+          <p className="text-[#0d1b3e]/60">Departman panelinizi seçin</p>
         </div>
         <div className="space-y-3">
           {departments.map((dept) => (
             <Link
               key={dept.id}
               href={dept.href}
-              className="flex items-center justify-between bg-white border border-[#0f1f4b]/10 rounded-2xl p-5 hover:border-[#0f1f4b] hover:shadow-md transition-all group"
+              className="flex items-center justify-between bg-white border border-[#0d1b3e]/10 rounded-2xl p-5 hover:border-[#0d1b3e] hover:shadow-md transition-all group"
             >
-              <span className="font-bold text-[#0f1f4b]">{dept.label}</span>
-              <ChevronRight size={20} className="text-[#0f1f4b]/40 group-hover:text-[#0f1f4b] transition-colors" />
+              <span className="font-bold text-[#0d1b3e]">{dept.label}</span>
+              <ChevronRight size={20} className="text-[#0d1b3e]/40 group-hover:text-[#0d1b3e] transition-colors" />
             </Link>
           ))}
           <Link
             href="/admin"
-            className="flex items-center justify-between bg-[#0f1f4b] rounded-2xl p-5 hover:bg-[#1a3278] transition-all"
+            className="flex items-center justify-between bg-[#0d1b3e] rounded-2xl p-5 hover:bg-[#152552] transition-all"
           >
             <span className="font-bold text-white">Admin Paneli</span>
             <ChevronRight size={20} className="text-white/60" />
