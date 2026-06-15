@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Edit2, Eye, EyeOff, X, BellOff } from "lucide-react";
 
@@ -12,21 +12,42 @@ type Announcement = {
   shown: boolean;
 };
 
+const STORAGE_KEY = "zenith_announcements";
 const categories = ["Duyuru", "Etkinlik", "Teknoloji", "Haberler", "Sektör"];
 
 const categoryColors: Record<string, string> = {
-  "Duyuru": "bg-blue-50 text-blue-700 border-blue-200",
-  "Etkinlik": "bg-green-50 text-green-700 border-green-200",
+  "Duyuru":    "bg-blue-50 text-blue-700 border-blue-200",
+  "Etkinlik":  "bg-green-50 text-green-700 border-green-200",
   "Teknoloji": "bg-purple-50 text-purple-700 border-purple-200",
-  "Haberler": "bg-amber-50 text-amber-700 border-amber-200",
-  "Sektör": "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "Haberler":  "bg-amber-50 text-amber-700 border-amber-200",
+  "Sektör":    "bg-indigo-50 text-indigo-700 border-indigo-200",
 };
+
+function load(): Announcement[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function save(items: Announcement[]) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch { /* ignore */ }
+}
 
 export default function AdminDuyurularPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({ title: "", content: "", category: "Duyuru", shown: true });
+
+  useEffect(() => {
+    setAnnouncements(load());
+  }, []);
+
+  const mutate = (next: Announcement[]) => {
+    setAnnouncements(next);
+    save(next);
+  };
 
   const resetForm = () => {
     setForm({ title: "", content: "", category: "Duyuru", shown: true });
@@ -35,21 +56,19 @@ export default function AdminDuyurularPage() {
   };
 
   const handleSave = () => {
-    if (!form.title) return;
+    if (!form.title.trim()) return;
+    let next: Announcement[];
     if (editId !== null) {
-      setAnnouncements((prev) =>
-        prev.map((a) => a.id === editId ? { ...a, ...form } : a)
-      );
+      next = announcements.map((a) => a.id === editId ? { ...a, ...form } : a);
     } else {
-      setAnnouncements((prev) => [
-        {
-          id: Date.now(),
-          ...form,
-          date: new Date().toLocaleDateString("tr-TR"),
-        },
-        ...prev,
-      ]);
+      const newItem: Announcement = {
+        id: Date.now(),
+        ...form,
+        date: new Date().toLocaleDateString("tr-TR"),
+      };
+      next = [newItem, ...announcements];
     }
+    mutate(next);
     resetForm();
   };
 
@@ -60,11 +79,11 @@ export default function AdminDuyurularPage() {
   };
 
   const toggleShown = (id: number) => {
-    setAnnouncements((prev) => prev.map((a) => a.id === id ? { ...a, shown: !a.shown } : a));
+    mutate(announcements.map((a) => a.id === id ? { ...a, shown: !a.shown } : a));
   };
 
   const handleDelete = (id: number) => {
-    setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+    mutate(announcements.filter((a) => a.id !== id));
   };
 
   const visibleCount = announcements.filter((a) => a.shown).length;
@@ -93,15 +112,20 @@ export default function AdminDuyurularPage() {
         {/* Özet */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {[
-            { label: "Toplam", value: announcements.length, color: "text-[#0d1b3e]" },
-            { label: "Yayında", value: visibleCount, color: "text-emerald-600" },
-            { label: "Gizli", value: announcements.length - visibleCount, color: "text-[#0d1b3e]/40" },
+            { label: "Toplam",  value: announcements.length,                         color: "text-[#0d1b3e]" },
+            { label: "Yayında", value: visibleCount,                                 color: "text-emerald-600" },
+            { label: "Gizli",   value: announcements.length - visibleCount,          color: "text-[#0d1b3e]/40" },
           ].map((s) => (
             <div key={s.label} className="bg-white border border-[#e8ecf3] rounded-2xl p-4 text-center">
               <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
               <div className="text-xs text-[#0d1b3e]/35 font-medium mt-0.5">{s.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Bilgi notu */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-xs text-blue-700 font-medium">
+          Yayında işaretlenen duyurular sitenin üst kısmında bir banner olarak ziyaretçilere gösterilir.
         </div>
 
         {/* Form */}
@@ -125,12 +149,12 @@ export default function AdminDuyurularPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">İçerik</label>
+                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">İçerik (opsiyonel)</label>
                 <textarea
-                  placeholder="Duyuru içeriği (opsiyonel)..."
+                  placeholder="Kısa açıklama..."
                   value={form.content}
                   onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  rows={3}
+                  rows={2}
                   className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/30 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none resize-none"
                 />
               </div>
@@ -153,7 +177,7 @@ export default function AdminDuyurularPage() {
                       onChange={(e) => setForm({ ...form, shown: e.target.checked })}
                       className="w-4 h-4 accent-[#0d1b3e]"
                     />
-                    <span className="text-sm text-[#0d1b3e]/60 font-medium">Blog&apos;da Yayınla</span>
+                    <span className="text-sm text-[#0d1b3e]/60 font-medium">Sitede Yayınla</span>
                   </label>
                 </div>
               </div>
@@ -197,7 +221,7 @@ export default function AdminDuyurularPage() {
                         <div className="text-[#0d1b3e]/40 text-xs mt-0.5 line-clamp-1">{a.content}</div>
                       )}
                       <div className="flex items-center gap-2 mt-1.5">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${categoryColors[a.category] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${categoryColors[a.category] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}>
                           {a.category}
                         </span>
                         <span className="text-[#0d1b3e]/25 text-xs">{a.date}</span>

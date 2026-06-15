@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import AnnouncementBanner from "./AnnouncementBanner";
 
 const navItems = [
   { label: "Ana Sayfa", href: "/" },
@@ -54,6 +55,7 @@ export default function Navbar() {
         ? "bg-white shadow-[0_2px_20px_rgba(13,27,62,0.08)] border-b border-[#e2e7f0]"
         : "bg-white border-b border-[#e2e7f0]"
     }`}>
+      <AnnouncementBanner />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[70px]">
 
@@ -121,12 +123,6 @@ export default function Navbar() {
             >
               Teklif Al
             </Link>
-            <Link
-              href="/giris"
-              className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold bg-[#0d1b3e]/8 text-[#0d1b3e] border border-[#0d1b3e]/15 rounded-xl hover:bg-[#0d1b3e] hover:text-white hover:border-[#0d1b3e] transition-all"
-            >
-              <LogIn size={15} /> Personel Girişi
-            </Link>
           </div>
 
           {/* Mobile Toggle */}
@@ -181,13 +177,6 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               Teklif Al
-            </Link>
-            <Link
-              href="/giris"
-              className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold border border-[#0d1b3e]/15 text-[#0d1b3e] rounded-xl"
-              onClick={() => setMobileOpen(false)}
-            >
-              <LogIn size={15} /> Personel Girişi
             </Link>
           </div>
         </div>

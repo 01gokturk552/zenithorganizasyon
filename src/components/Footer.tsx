@@ -176,6 +176,9 @@ export default function Footer() {
                 {link.label}
               </Link>
             ))}
+            <Link href="/giris" className="text-white/20 hover:text-white/50 text-xs transition-colors">
+              Personel Girişi
+            </Link>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Edit2, Search, UserX, X } from "lucide-react";
 
@@ -13,21 +13,37 @@ type Member = {
   joined: string;
 };
 
+const STORAGE_KEY = "zenith_members";
 const depts = ["Tümü", "PR", "Saha", "Press", "Güvenlik", "İK", "Finans", "IT"];
 
 const statusColors: Record<string, string> = {
-  "Aktif": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "Aktif":  "bg-emerald-50 text-emerald-700 border-emerald-200",
   "İzinli": "bg-amber-50 text-amber-700 border-amber-200",
-  "Pasif": "bg-gray-100 text-gray-500 border-gray-200",
+  "Pasif":  "bg-gray-100 text-gray-500 border-gray-200",
 };
+
+function load(): Member[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function persist(items: Member[]) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch { /* ignore */ }
+}
 
 export default function AdminUyelerPage() {
   const [search, setSearch] = useState("");
-  const [dept, setDept] = useState("Tümü");
+  const [dept, setDept]     = useState("Tümü");
   const [members, setMembers] = useState<Member[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", dept: "PR", role: "", email: "", status: "Aktif" as Member["status"] });
   const [editId, setEditId] = useState<number | null>(null);
+
+  useEffect(() => { setMembers(load()); }, []);
+
+  const mutate = (next: Member[]) => { setMembers(next); persist(next); };
 
   const filtered = members.filter((m) => {
     const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -38,17 +54,14 @@ export default function AdminUyelerPage() {
 
   const handleSave = () => {
     if (!form.name || !form.email) return;
+    let next: Member[];
     if (editId !== null) {
-      setMembers((prev) => prev.map((m) => m.id === editId ? { ...m, ...form } : m));
+      next = members.map((m) => m.id === editId ? { ...m, ...form } : m);
       setEditId(null);
     } else {
-      const newMember: Member = {
-        id: Date.now(),
-        ...form,
-        joined: new Date().toISOString().split("T")[0],
-      };
-      setMembers((prev) => [newMember, ...prev]);
+      next = [{ id: Date.now(), ...form, joined: new Date().toISOString().split("T")[0] }, ...members];
     }
+    mutate(next);
     setForm({ name: "", dept: "PR", role: "", email: "", status: "Aktif" });
     setShowForm(false);
   };
@@ -59,9 +72,7 @@ export default function AdminUyelerPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: number) => {
-    setMembers((prev) => prev.filter((m) => m.id !== id));
-  };
+  const handleDelete = (id: number) => { mutate(members.filter((m) => m.id !== id)); };
 
   return (
     <div className="min-h-screen bg-[#f4f6fa]">
@@ -94,53 +105,33 @@ export default function AdminUyelerPage() {
               </button>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">Ad Soyad *</label>
-                <input
-                  type="text"
-                  placeholder="Ad Soyad"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">E-posta *</label>
-                <input
-                  type="email"
-                  placeholder="ornek@mail.com"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
-                />
-              </div>
+              {[
+                { label: "Ad Soyad *", key: "name",  type: "text",  placeholder: "Ad Soyad" },
+                { label: "E-posta *",   key: "email", type: "email", placeholder: "ornek@mail.com" },
+                { label: "Rol / Unvan", key: "role",  type: "text",  placeholder: "Koordinatör, Uzman..." },
+              ].map((f) => (
+                <div key={f.key}>
+                  <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">{f.label}</label>
+                  <input
+                    type={f.type}
+                    placeholder={f.placeholder}
+                    value={form[f.key as keyof typeof form] as string}
+                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                    className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
+                  />
+                </div>
+              ))}
               <div>
                 <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">Departman</label>
-                <select
-                  value={form.dept}
-                  onChange={(e) => setForm({ ...form, dept: e.target.value })}
-                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
-                >
+                <select value={form.dept} onChange={(e) => setForm({ ...form, dept: e.target.value })}
+                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white">
                   {depts.slice(1).map((d) => <option key={d}>{d}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">Rol / Unvan</label>
-                <input
-                  type="text"
-                  placeholder="Koordinatör, Uzman..."
-                  value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
-                />
-              </div>
-              <div>
                 <label className="block text-xs font-bold text-[#0d1b3e]/40 uppercase tracking-wider mb-1.5">Durum</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value as Member["status"] })}
-                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white"
-                >
+                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as Member["status"] })}
+                  className="w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/40 rounded-xl px-4 py-2.5 text-sm text-[#0d1b3e] outline-none bg-white">
                   <option>Aktif</option>
                   <option>İzinli</option>
                   <option>Pasif</option>
@@ -162,19 +153,12 @@ export default function AdminUyelerPage() {
         <div className="bg-white border border-[#e8ecf3] rounded-2xl p-4 mb-5 flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-48">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#0d1b3e]/30" />
-            <input
-              type="text"
-              placeholder="Üye ara..."
-              value={search}
+            <input type="text" placeholder="Üye ara..." value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 pr-4 py-2.5 text-sm border border-[#e8ecf3] rounded-xl focus:outline-none focus:border-[#0d1b3e]/30 w-full bg-[#f4f6fa] text-[#0d1b3e] placeholder-[#0d1b3e]/30"
-            />
+              className="pl-8 pr-4 py-2.5 text-sm border border-[#e8ecf3] rounded-xl focus:outline-none focus:border-[#0d1b3e]/30 w-full bg-[#f4f6fa] text-[#0d1b3e] placeholder-[#0d1b3e]/30" />
           </div>
-          <select
-            value={dept}
-            onChange={(e) => setDept(e.target.value)}
-            className="text-sm border border-[#e8ecf3] rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#0d1b3e]/30 bg-[#f4f6fa] text-[#0d1b3e]"
-          >
+          <select value={dept} onChange={(e) => setDept(e.target.value)}
+            className="text-sm border border-[#e8ecf3] rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#0d1b3e]/30 bg-[#f4f6fa] text-[#0d1b3e]">
             {depts.map((d) => <option key={d}>{d}</option>)}
           </select>
         </div>
