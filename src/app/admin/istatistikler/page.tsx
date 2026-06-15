@@ -1,13 +1,17 @@
 "use client";
 import Link from "next/link";
 import { ArrowLeft, Save, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStats, type Stat } from "@/components/SiteStats";
 
 export default function AdminIstatistiklerPage() {
   const { stats, saveStats } = useStats();
-  const [form, setForm]       = useState<Stat[]>(stats);
+  const [form, setForm]       = useState<Stat[]>([]);
   const [saved, setSaved]     = useState(false);
+
+  useEffect(() => {
+    if (stats.length > 0) setForm(stats);
+  }, [stats]);
 
   const update = (id: string, field: keyof Stat, val: string) => {
     setSaved(false);
@@ -75,6 +79,9 @@ export default function AdminIstatistiklerPage() {
         </div>
 
         <div className="space-y-4">
+          {form.length === 0 && (
+            <div className="bg-white border border-[#e8ecf3] rounded-2xl p-8 text-center text-[#0d1b3e]/40 text-sm">Yükleniyor...</div>
+          )}
           {form.map((s, i) => (
             <div key={s.id} className="bg-white border border-[#e8ecf3] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-5">

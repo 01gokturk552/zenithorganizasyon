@@ -4,6 +4,33 @@ import { ArrowLeft, Save, RotateCcw, Globe, Phone, Mail, MapPin, Clock, Share2, 
 import { useState, useEffect } from "react";
 import { type Settings, DEFAULT_SETTINGS as DEFAULT } from "@/lib/db";
 
+type FieldProps = {
+  label: string;
+  placeholder?: string;
+  icon?: React.ElementType;
+  type?: string;
+  value: string;
+  onChange: (val: string) => void;
+};
+
+function Field({ label, placeholder, icon: Icon, type = "text", value, onChange }: FieldProps) {
+  return (
+    <div>
+      <label className="block text-[10px] font-black text-[#0d1b3e]/35 uppercase tracking-widest mb-1.5">{label}</label>
+      <div className="relative">
+        {Icon && <Icon size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#0d1b3e]/25" />}
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/30 rounded-xl py-2.5 text-sm text-[#0d1b3e] outline-none placeholder-[#0d1b3e]/20 ${Icon ? "pl-9 pr-4" : "px-4"}`}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function AdminAyarlarPage() {
   const [form, setForm]   = useState<Settings>(DEFAULT);
   const [saved, setSaved] = useState(false);
@@ -31,24 +58,6 @@ export default function AdminAyarlarPage() {
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
-
-  const Field = ({
-    label, id, placeholder, icon: Icon, type = "text",
-  }: { label: string; id: keyof Settings; placeholder?: string; icon?: typeof Mail; type?: string }) => (
-    <div>
-      <label className="block text-[10px] font-black text-[#0d1b3e]/35 uppercase tracking-widest mb-1.5">{label}</label>
-      <div className="relative">
-        {Icon && <Icon size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#0d1b3e]/25" />}
-        <input
-          type={type}
-          value={form[id]}
-          onChange={(e) => update(id, e.target.value)}
-          placeholder={placeholder}
-          className={`w-full border border-[#e8ecf3] focus:border-[#0d1b3e]/30 rounded-xl py-2.5 text-sm text-[#0d1b3e] outline-none placeholder-[#0d1b3e]/20 ${Icon ? "pl-9 pr-4" : "px-4"}`}
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-[#f4f6fa]">
@@ -90,8 +99,8 @@ export default function AdminAyarlarPage() {
             <h2 className="font-black text-[#0d1b3e] text-sm">Genel Bilgiler</h2>
           </div>
           <div className="space-y-4">
-            <Field label="Site Adı"  id="siteAdi"  placeholder="Zenith Organizasyon" />
-            <Field label="Slogan"    id="slogan"   placeholder="Etkinliğinizi Zirveye Taşıyoruz." />
+            <Field label="Site Adı"  placeholder="Zenith Organizasyon"              value={form.siteAdi}  onChange={(v) => update("siteAdi", v)} />
+            <Field label="Slogan"    placeholder="Etkinliğinizi Zirveye Taşıyoruz." value={form.slogan}   onChange={(v) => update("slogan", v)} />
           </div>
         </section>
 
@@ -104,12 +113,12 @@ export default function AdminAyarlarPage() {
             <h2 className="font-black text-[#0d1b3e] text-sm">İletişim Bilgileri</h2>
           </div>
           <div className="space-y-4">
-            <Field label="E-posta"  id="email"   placeholder="info@zenithorganizasyon.com" icon={Mail}   type="email" />
-            <Field label="Telefon"  id="telefon" placeholder="+90 5XX XXX XX XX"           icon={Phone} />
-            <Field label="Adres"    id="adres"   placeholder="Şehir, Türkiye"              icon={MapPin} />
+            <Field label="E-posta"  placeholder="info@zenithorganizasyon.com" icon={Mail}   type="email" value={form.email}       onChange={(v) => update("email", v)} />
+            <Field label="Telefon"  placeholder="+90 5XX XXX XX XX"           icon={Phone}              value={form.telefon}     onChange={(v) => update("telefon", v)} />
+            <Field label="Adres"    placeholder="Şehir, Türkiye"              icon={MapPin}             value={form.adres}       onChange={(v) => update("adres", v)} />
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Çalışma Günleri" id="calismaGun"  placeholder="Pzt – Cum"    icon={Clock} />
-              <Field label="Çalışma Saati"   id="calismaSaat" placeholder="09:00 – 18:00" icon={Clock} />
+              <Field label="Çalışma Günleri" placeholder="Pzt – Cum"    icon={Clock} value={form.calismaGun}  onChange={(v) => update("calismaGun", v)} />
+              <Field label="Çalışma Saati"   placeholder="09:00 – 18:00" icon={Clock} value={form.calismaSaat} onChange={(v) => update("calismaSaat", v)} />
             </div>
           </div>
         </section>
@@ -123,10 +132,10 @@ export default function AdminAyarlarPage() {
             <h2 className="font-black text-[#0d1b3e] text-sm">Sosyal Medya</h2>
           </div>
           <div className="space-y-4">
-            <Field label="Instagram" id="instagram" placeholder="https://instagram.com/..." icon={Share2} />
-            <Field label="X / Twitter" id="twitter" placeholder="https://twitter.com/..."  icon={AtSign} />
-            <Field label="LinkedIn"  id="linkedin"  placeholder="https://linkedin.com/..."  icon={Link2} />
-            <Field label="YouTube"   id="youtube"   placeholder="https://youtube.com/..."   icon={PlayCircle} />
+            <Field label="Instagram"   placeholder="https://instagram.com/..." icon={Share2}     value={form.instagram} onChange={(v) => update("instagram", v)} />
+            <Field label="X / Twitter" placeholder="https://twitter.com/..."   icon={AtSign}     value={form.twitter}   onChange={(v) => update("twitter", v)} />
+            <Field label="LinkedIn"    placeholder="https://linkedin.com/..."   icon={Link2}      value={form.linkedin}  onChange={(v) => update("linkedin", v)} />
+            <Field label="YouTube"     placeholder="https://youtube.com/..."    icon={PlayCircle} value={form.youtube}   onChange={(v) => update("youtube", v)} />
           </div>
         </section>
 
@@ -139,16 +148,16 @@ export default function AdminAyarlarPage() {
             <div className="font-black text-white text-xl mb-1">{form.siteAdi || "Zenith Organizasyon"}</div>
             <div className="text-white/40 text-sm mb-5">{form.slogan || "—"}</div>
             <div className="flex flex-wrap gap-5 text-white/40 text-xs">
-              {form.email   && <span className="flex items-center gap-1.5"><Mail    size={11} /> {form.email}</span>}
-              {form.telefon && <span className="flex items-center gap-1.5"><Phone   size={11} /> {form.telefon}</span>}
-              {form.adres   && <span className="flex items-center gap-1.5"><MapPin  size={11} /> {form.adres}</span>}
+              {form.email   && <span className="flex items-center gap-1.5"><Mail   size={11} /> {form.email}</span>}
+              {form.telefon && <span className="flex items-center gap-1.5"><Phone  size={11} /> {form.telefon}</span>}
+              {form.adres   && <span className="flex items-center gap-1.5"><MapPin size={11} /> {form.adres}</span>}
             </div>
             {(form.instagram || form.twitter || form.linkedin || form.youtube) && (
               <div className="flex gap-3 mt-4">
-                {form.instagram && <a href={form.instagram} className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"><Share2 size={13} className="text-white/60" /></a>}
-                {form.twitter   && <a href={form.twitter}   className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"><AtSign   size={13} className="text-white/60" /></a>}
-                {form.linkedin  && <a href={form.linkedin}  className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"><Link2  size={13} className="text-white/60" /></a>}
-                {form.youtube   && <a href={form.youtube}   className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"><PlayCircle   size={13} className="text-white/60" /></a>}
+                {form.instagram && <span className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center"><Share2     size={13} className="text-white/60" /></span>}
+                {form.twitter   && <span className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center"><AtSign     size={13} className="text-white/60" /></span>}
+                {form.linkedin  && <span className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center"><Link2      size={13} className="text-white/60" /></span>}
+                {form.youtube   && <span className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center"><PlayCircle size={13} className="text-white/60" /></span>}
               </div>
             )}
           </div>
