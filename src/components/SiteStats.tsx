@@ -11,9 +11,9 @@ export function useStats() {
     getStats().then(setStats);
   }, []);
 
-  const save = async (newStats: Stat[]) => {
+  const save = async (newStats: Stat[]): Promise<boolean> => {
     setStats(newStats);
-    await saveStats(newStats);
+    return saveStats(newStats);
   };
 
   return { stats, saveStats: save };

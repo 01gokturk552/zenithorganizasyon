@@ -22,13 +22,20 @@ export default function AdminIstatistiklerPage() {
     setForm((prev) => prev.map((s) => s.id === id ? { ...s, [field]: val } : s));
   };
 
-  const handleSave = () => {
-    saveStats(form);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const [error, setError] = useState("");
+
+  const handleSave = async () => {
+    setError("");
+    const ok = await saveStats(form);
+    if (ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } else {
+      setError("Kaydetme başarısız! Supabase bağlantısını kontrol edin.");
+    }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     const defaults: Stat[] = [
       { id: "etkinlik",  label: "Tamamlanan Etkinlik", value: "0",   suffix: "" },
       { id: "kadro",     label: "Uzman Kadro",          value: "0",   suffix: "" },
@@ -36,9 +43,11 @@ export default function AdminIstatistiklerPage() {
       { id: "cozum",     label: "Çözüm Odaklı",          value: "100", suffix: "%" },
     ];
     setForm(defaults);
-    saveStats(defaults);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    const ok = await saveStats(defaults);
+    if (ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }
   };
 
   return (
@@ -81,6 +90,10 @@ export default function AdminIstatistiklerPage() {
             anında ana sayfada yansır.
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">{error}</div>
+        )}
 
         <div className="space-y-4">
           {form.length === 0 && (

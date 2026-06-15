@@ -21,10 +21,11 @@ export async function getStats(): Promise<Stat[]> {
   catch { return DEFAULT_STATS; }
 }
 
-export async function saveStats(stats: Stat[]): Promise<void> {
-  await supabase
+export async function saveStats(stats: Stat[]): Promise<boolean> {
+  const { error } = await supabase
     .from("settings")
     .upsert({ key: "_stats_json", value: JSON.stringify(stats) }, { onConflict: "key" });
+  return !error;
 }
 
 // ─── SETTINGS ───────────────────────────────────────────────────────────────
