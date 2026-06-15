@@ -8,10 +8,14 @@ export default function AdminIstatistiklerPage() {
   const { stats, saveStats } = useStats();
   const [form, setForm]       = useState<Stat[]>([]);
   const [saved, setSaved]     = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    if (stats.length > 0) setForm(stats);
-  }, [stats]);
+    if (!initialized && stats.length > 0) {
+      setForm(stats);
+      setInitialized(true);
+    }
+  }, [stats, initialized]);
 
   const update = (id: string, field: keyof Stat, val: string) => {
     setSaved(false);

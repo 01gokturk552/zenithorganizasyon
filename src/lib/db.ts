@@ -12,7 +12,8 @@ export const DEFAULT_STATS: Stat[] = [
 
 export async function getStats(): Promise<Stat[]> {
   const { data } = await supabase.from("stats").select("*");
-  return (data as Stat[]) ?? DEFAULT_STATS;
+  if (!data || data.length === 0) return DEFAULT_STATS;
+  return data as Stat[];
 }
 
 export async function saveStats(stats: Stat[]): Promise<void> {
