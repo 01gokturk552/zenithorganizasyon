@@ -71,8 +71,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         <Navbar />
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-4xl font-black text-[#0f1f4b] mb-4">Hizmet Bulunamadı</h1>
-            <Link href="/hizmetlerimiz" className="text-[#0f1f4b] underline">Tüm hizmetler</Link>
+            <h1 className="text-4xl font-black text-[#0d1b3e] mb-4">Hizmet Bulunamadı</h1>
+            <Link href="/hizmetlerimiz" className="text-[#0d1b3e] underline">Tüm hizmetler</Link>
           </div>
         </div>
         <Footer />
@@ -84,7 +84,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
     <main>
       <Navbar />
 
-      <section className="bg-[#0f1f4b] text-white py-24">
+      <section className="bg-[#0d1b3e] text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/hizmetlerimiz" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-8 text-sm transition-colors">
             <ArrowLeft size={16} /> Hizmetlerimiz
@@ -100,36 +100,36 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-16">
           <div>
-            <h2 className="text-2xl font-black text-[#0f1f4b] mb-8">Neler Sunuyoruz?</h2>
+            <h2 className="text-2xl font-black text-[#0d1b3e] mb-8">Neler Sunuyoruz?</h2>
             <div className="space-y-4">
               {service.features.map((f) => (
-                <div key={f} className="flex items-center gap-3 p-4 border border-[#0f1f4b]/10 rounded-xl">
-                  <CheckCircle size={18} className="text-[#0f1f4b] flex-shrink-0" />
-                  <span className="font-medium text-[#0f1f4b]">{f}</span>
+                <div key={f} className="flex items-center gap-3 p-4 border border-[#0d1b3e]/10 rounded-xl">
+                  <CheckCircle size={18} className="text-[#0d1b3e] flex-shrink-0" />
+                  <span className="font-medium text-[#0d1b3e]">{f}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div>
-            <h2 className="text-2xl font-black text-[#0f1f4b] mb-8">Sürecimiz</h2>
+            <h2 className="text-2xl font-black text-[#0d1b3e] mb-8">Sürecimiz</h2>
             <div className="space-y-4">
               {service.process.map((step, i) => (
                 <div key={step} className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#0f1f4b] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-[#0d1b3e] rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-black text-sm">{i + 1}</span>
                   </div>
-                  <div className="flex-1 p-4 border border-[#0f1f4b]/10 rounded-xl">
-                    <span className="font-medium text-[#0f1f4b]">{step}</span>
+                  <div className="flex-1 p-4 border border-[#0d1b3e]/10 rounded-xl">
+                    <span className="font-medium text-[#0d1b3e]">{step}</span>
                   </div>
                   {i < service.process.length - 1 && (
-                    <div className="absolute left-5 mt-10 w-0.5 h-4 bg-[#0f1f4b]/20" />
+                    <div className="absolute left-5 mt-10 w-0.5 h-4 bg-[#0d1b3e]/20" />
                   )}
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 bg-[#0f1f4b] rounded-2xl p-6 text-white">
+            <div className="mt-10 bg-[#0d1b3e] rounded-2xl p-6 text-white">
               <h3 className="font-black text-xl mb-2">Bu Hizmet Hakkında Teklif Alın</h3>
               <p className="text-white/60 text-sm mb-4">Etkinliğiniz için özel fiyat teklifi hazırlayalım.</p>
               <Link
